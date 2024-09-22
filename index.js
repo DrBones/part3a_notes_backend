@@ -3,6 +3,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import Note from "./models/note.js";
+import mongoose from "mongoose";
 const app = express();
 
 app.use(express.json());
@@ -38,8 +39,22 @@ app.get("/api/notes", (req, res) => {
 app.get("/api/notes/:id", (req, res) => {
   const id = req.params.id;
   // const note = notes.find((note) => note.id === id);
-  Note.findById(id).then((note) => res.json(note));
-
+  if (mongoose.isValidObjectId(id)) {
+    Note.findById(id)
+      .then((note) => {
+        if (note) {
+          res.json(note);
+        } else {
+          res.status(404).end();
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(500).end();
+      });
+  } else {
+    res.status(404).end();
+  }
   // if (note) {
   //   res.send(note);
   // } else {
