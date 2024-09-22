@@ -1,6 +1,8 @@
 console.log("Notes Backend Starting");
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import Note from "./models/note.js";
 const app = express();
 
 app.use(express.json());
@@ -30,19 +32,20 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/notes", (req, res) => {
-  res.send(notes);
+  Note.find({}).then((notes) => res.send(notes));
 });
 
 app.get("/api/notes/:id", (req, res) => {
   const id = req.params.id;
-  const note = notes.find((note) => note.id === id);
+  // const note = notes.find((note) => note.id === id);
+  Note.findById(id).then((note) => res.json(note));
 
-  if (note) {
-    res.send(note);
-  } else {
-    res.statusMessage = "No note with that id found";
-    res.status(404).end();
-  }
+  // if (note) {
+  //   res.send(note);
+  // } else {
+  //   res.statusMessage = "No note with that id found";
+  //   res.status(404).end();
+  // }
 });
 
 app.delete("/api/notes/:id", (req, res) => {
@@ -51,26 +54,23 @@ app.delete("/api/notes/:id", (req, res) => {
   res.status(204).end();
 });
 
-const generateID = () => {
-  const maxID =
-    notes.length > 0 ? Math.max(...notes.map((note) => Number(note.id))) : 0;
-  return String(maxID + 1);
-};
-
 app.post("/api/notes", (req, res) => {
   const body = req.body;
 
   if (!body.content) {
     return res.status(400).json({ error: "Content is Missing" });
   }
-  const note = {
+  const note = new Note({
     content: body.content,
     important: Boolean(body.important) || false,
-    id: generateID(),
-  };
-  notes = notes.concat(note);
-  res.json(note);
-  console.log(note);
+    // id: generateID(),
+  });
+  note.save().then((savedNote) => {
+    res.json(savedNote);
+  });
+  // notes = notes.concat(note);
+  // res.json(note);
+  // console.log(note);
 });
 
 const PORT = process.env.PORT || 3001;

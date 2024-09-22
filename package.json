@@ -7,14 +7,18 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build:ui": "rm -rf build && cd ../part2a_notes_frontend && pnpm run build --prod && cp -r build ../part3a_notes_backend",
+    "deploy:full": "pnpm run build:ui && git add . && git commit -m uibuild && git push"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.21.0"
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "mongoose": "^8.6.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.7"
