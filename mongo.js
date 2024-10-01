@@ -7,7 +7,7 @@ if (process.argv.length < 3) {
 
 const password = process.argv[2];
 
-const url = `mongodb+srv://jnssieglmongoatlas:${password}@fullstackopen.hl2g9.mongodb.net/noteApp?retryWrites=true&w=majority&appName=fullstackopen`;
+const url = `mongodb+srv://drbonesmongodbatlas:${password}@fullstackopen.hl2g9.mongodb.net/testNoteApp?retryWrites=true&w=majority&appName=fullstackopen`;
 
 mongoose.set("strictQuery", false);
 
@@ -84,9 +84,28 @@ const Note = mongoose.model("Note", noteSchema);
 //   console.log("All promises have resolved");
 //   mongoose.connection.close();
 // });
-Note.find({ important: true }).then((result) => {
-  result.forEach((note) => {
-    console.log(note);
+if (process.argv.length === 3) {
+  console.log("Notes");
+  Note.find().then((result) => {
+    result.forEach((note) => {
+      console.log(`Content: ${note.content} Important: ${note.important}`);
+    });
+    mongoose.connection.close();
   });
-  mongoose.connection.close();
-});
+} else if (process.argv.length === 5) {
+  const note = {
+    content: process.argv[3],
+    important: process.argv[4],
+  };
+  const newNote = new Note(note);
+  await newNote.save().then((note) => {
+    console.log(note);
+    console.log("Note has been added to MongoDB");
+    mongoose.connection.close();
+  });
+} else {
+  console.log(
+    "I don't know what to do with all those argv, shutting down. Please use only 1 or 3"
+  );
+  process.exit();
+}

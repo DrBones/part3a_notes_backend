@@ -2,10 +2,9 @@ import express from "express";
 const notesRouter = express.Router();
 import Note from "../models/note.js";
 
-notesRouter.get("/", (request, response) => {
-  Note.find({}).then((notes) => {
-    response.json(notes);
-  });
+notesRouter.get("/", async (request, response) => {
+  const notes = await Note.find({});
+  response.json(notes);
 });
 
 notesRouter.get("/:id", (request, response, next) => {
@@ -22,7 +21,9 @@ notesRouter.get("/:id", (request, response, next) => {
 
 notesRouter.post("/", (request, response, next) => {
   const body = request.body;
-
+  if (body.content === undefined) {
+    return response.status(400).end();
+  }
   const note = new Note({
     content: body.content,
     important: body.important || false,
@@ -31,7 +32,7 @@ notesRouter.post("/", (request, response, next) => {
   note
     .save()
     .then((savedNote) => {
-      response.json(savedNote);
+      response.status(201).json(savedNote);
     })
     .catch((error) => next(error));
 });
