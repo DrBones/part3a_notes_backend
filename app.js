@@ -1,5 +1,6 @@
 import config from "./utils/config.js";
 import express from "express";
+import "express-async-errors";
 const app = express();
 import cors from "cors";
 import notesRouter from "./controllers/notes.js";
